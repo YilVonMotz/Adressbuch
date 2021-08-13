@@ -341,54 +341,47 @@ namespace AdressbuchWPF
 
         private void BuildInsertString()
         {
-            //if(comboBox1.SelectedItem == null)
-            //{
-            //    return;
-            //}
-            //StringBuilder insertString = new StringBuilder("Insert into "+comboBox1.SelectedItem);
-            //StringBuilder columnNames = new StringBuilder();
-            //StringBuilder values = new StringBuilder();
+            if (comboBox1.SelectedItem == null)
+            {
+                return;
+            }
+            StringBuilder insertString = new StringBuilder("Insert into " + selectedTable);
+            StringBuilder values = new StringBuilder();
+            StringBuilder labels = new StringBuilder();
+            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
 
-            //for(int i = 0; i < searchGroups.Count; i++)
-            //{
-            //    if (searchGroups[i].GetComboBox().SelectedItem == null)
-            //        continue;
-            //    if (i > 0)
-            //    {
-            //        columnNames.Append(",");
-            //        columnNames.Append("'"+searchGroups[i].GetComboBox().SelectedItem.ToString()+ "'");
+            foreach(InputBox item in inputBoxes)
+            {
+                if(item.GetInputText() != string.Empty)
+                {
+                    keyValuePairs.Add(item.GetLabel(), item.GetInputText());
+                }
+            }
 
-            //    }
-            //    else
-            //    {
-            //        columnNames.Append("'"+searchGroups[i].GetComboBox().SelectedItem.ToString()+ "'");
-            //    }
+
+            for (int i = 0; i < keyValuePairs.Count; i++)
+            {
                 
-            //}
+                if (i > 0)
+                {
+                    values.Append(",");
+                    values.Append("'" + keyValuePairs.ElementAt(i).Value+ "'");
 
+                    labels.Append(",");
+                    labels.Append("'" + keyValuePairs.ElementAt(i).Key + "'");
 
-            //for (int i = 0; i < searchGroups.Count; i++)
-            //{
-            //    if (searchGroups[i].GetComboBox().SelectedItem == null)
-            //        continue;
-            //    if (i > 0)
-            //    {
-            //        values.Append(",");
-            //        values.Append("'"+searchGroups[i].GetTextBox().Text+ "'");
-                    
+                }
+                else
+                {
+                    values.Append("'" + keyValuePairs.ElementAt(i).Value + "'");
+                    labels.Append("'" + keyValuePairs.ElementAt(i).Key + "'");
+                }
 
-            //    }
-            //    else
-            //    {
-            //        values.Append("'"+searchGroups[i].GetTextBox().Text+ "'");
-            //    }
+            }
+           
 
-            //}
-
-            //insertString.Append("(" + columnNames.ToString() + ") VALUES (" + values.ToString()+")");
-            //com_insert.CommandText = insertString.ToString();
-
-
+            insertString.Append("("+labels.ToString()+") VALUES (" + values.ToString() + ")");
+            com_insert.CommandText = insertString.ToString();
 
         }
 
