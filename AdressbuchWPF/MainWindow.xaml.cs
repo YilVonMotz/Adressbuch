@@ -69,7 +69,8 @@ namespace AdressbuckWPF
 
             try
             {
-                connection = new SQLiteConnection(ConfigurationManager.ConnectionStrings["Default"].ConnectionString);
+                //connection = new SQLiteConnection(ConfigurationManager.ConnectionStrings["Default"].ConnectionString);
+                connection = new SQLiteConnection("Data Source = Adressbuch.db; Version = 3");
                 connection.Open();
             }
             catch(SQLiteException ex)
