@@ -7,23 +7,30 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="876.829" SizeToContent="Width">
     <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="#FF45AC8B" Offset="0"/>
+                <GradientStop Color="#FF1F82E6" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
 
-        <DataGrid x:Name="dataGrid" Margin="10,167,10,10" RowEditEnding="DataGrid_RowEditEnding" CellEditEnding="DataGrid_CellEditEnding">
+        <DataGrid x:Name="dataGrid" Margin="10,167,10,10" RowEditEnding="DataGrid_RowEditEnding" CellEditEnding="DataGrid_CellEditEnding" Background="#FFE2E2E0">
 
         </DataGrid>
         <StackPanel>
             <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
-                <ComboBox x:Name="comboBox1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="124" IsReadOnly="True" DropDownClosed="ComboBox1_DropDownClosed" Margin="10,10,0,0"/>
+                <ComboBox x:Name="comboBox1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="124" DropDownClosed="ComboBox1_DropDownClosed" Margin="10,10,0,0"/>
                 <Rectangle Width="100">
 
                 </Rectangle>
-                <Button x:Name="button" Content="Suche" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Background="#FFDDDDDD" Click="Button_Click_1"/>
-                <Button x:Name="button2" Content="Eintrag erstellen" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Click="Button2_Click"/>
-                <Button x:Name="button3" Content="Eintrag Löschen" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Click="Button3_Click"/>
+                <Button x:Name="button" Content="SUCHEN" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Background="#FFDDDDDD" Click="Button_Click_1"/>
+                <Button x:Name="button2" Content="EINTRAG ERSTELLEN" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Click="Button2_Click"/>
+                <Button x:Name="button3" Content="EINTRAG LÖSCHEN" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Click="Button3_Click"/>
             </StackPanel>
-            <GroupBox x:Name="groupBox" Header="GroupBox&#x9;&#x9;&#x9;&#x9;" Margin="10,10,10,0" Height="115" VerticalAlignment="Top">
+            <GroupBox x:Name="groupBox" Header="" Margin="10,10,10,0" Height="82" VerticalAlignment="Top">
                 <StackPanel x:Name="StackPanel_SearchGroup" Orientation="Horizontal" Margin="0,0,-2,0"/>
             </GroupBox>
+            <TextBlock x:Name="hilfeBox" TextWrapping="Wrap" Text="TextBlock" Height="36" Margin="10,0"/>
         </StackPanel>
 
 
