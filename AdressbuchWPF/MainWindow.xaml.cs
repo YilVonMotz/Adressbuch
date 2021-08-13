@@ -17,7 +17,7 @@ using System.Configuration;
 using System.Data;
 
 
-namespace AdressbuckWPF
+namespace AdressbuchWPF
 {
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml
@@ -31,11 +31,13 @@ namespace AdressbuckWPF
 
         private List<string> mitarbeiterColumnNames = new List<string>();
         private List<string> organisationColumnNames = new List<string>();
-        private List<string> fields = new List<string>();
-        public static List<string> availableFields = new List<string>();
+
+        private List<InputBox> inputBoxes = new List<InputBox>();
+        
         private Dictionary<string, string> datagridRowDict = new Dictionary<string, string>();
 
-        private List<Search> searchGroups = new List<Search>();
+        public string SelectedTable { get { return selectedTable; } }
+        private string selectedTable;
 
         private SQLiteCommand com_GetMitarbeiterFields;
         private string com_GetMitarbeiterFieldsString = "select name from pragma_table_info('Mitarbeiter')";
@@ -54,7 +56,7 @@ namespace AdressbuckWPF
         private SQLiteCommand com_delete;
         private SQLiteCommand com_update;
         
-        private string tableName;
+        
 
         
 
@@ -118,8 +120,7 @@ namespace AdressbuckWPF
         }
 
 
-
-        private void FillDataGrid(SQLiteCommand command)
+        private void FillDataGrid(DataGrid dataGrid, SQLiteCommand command)
         {
             try
             {
@@ -136,17 +137,15 @@ namespace AdressbuckWPF
         }
 
 
-
-
-        private string CombineStrings(params string[] strings)
+        private List<string> GetDataGridRowValues(DataGrid grid)
         {
-            StringBuilder sb = new StringBuilder();
-            foreach(string item in strings)
-            {
-                sb.Append(item);
-            }
-            return sb.ToString();
+            List<string> result = new List<string>();
+
+            Console.WriteLine(grid.CurrentItem.ToString());
+            return result;
+                
         }
+
 
 
 
@@ -183,24 +182,50 @@ namespace AdressbuckWPF
 
 
 
-
-        private void ComboBox1_DropDownClosed(object sender, EventArgs e)
+        private void InitiateInputBoxes()
         {
-            RemoveAllSearchGroups();
+            if (selectedTable == "Mitarbeiter")
+            {
+                for(int i = 0; i < mitarbeiterColumnNames.Count; i++)
+                {
+                    InputBox inputBox = new InputBox();
+                    inputBox.SetLabel(mitarbeiterColumnNames[i]);                    
+                    StackPanel_InputBoxes.Children.Add(inputBox);
+                    inputBoxes.Add(inputBox);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < organisationColumnNames.Count; i++)
+                {
+                    InputBox inputBox = new InputBox();
+                    inputBox.SetLabel(organisationColumnNames[i]);
+                    StackPanel_InputBoxes.Children.Add(inputBox);
+                    inputBoxes.Add(inputBox);
+                }
+            }
+        }
+
+
+        private void TableSelect_Dropdown(object sender, EventArgs e)
+        {            
 
             if(comboBox1.SelectedItem == null)
             {
                 return;
             }
 
-            string itemName = comboBox1.SelectedItem.ToString();
-            tableName = itemName;
+            selectedTable = comboBox1.SelectedItem.ToString();
 
-            switch (itemName)
+            StackPanel_InputBoxes.Children.Clear();
+            inputBoxes.Clear();
+            
+
+            switch (selectedTable)
             {
                 case "Mitarbeiter":
 
-                    com_GetAllMitarbeiter.CommandText = "select * from " + itemName;
+                    com_GetAllMitarbeiter.CommandText = "select * from " + selectedTable;
                     try
                     {
                         reader = com_GetMitarbeiterFields.ExecuteReader();
@@ -209,14 +234,14 @@ namespace AdressbuckWPF
                     {
                         MessageBox.Show(ex.Message);
                     }
-                    
-                    FillDataGrid(com_GetAllMitarbeiter);
+
+                    FillDataGrid(dataGridOutput,com_GetAllMitarbeiter);
                    
                    
                     break;
                 case "Organisation":
 
-                    com_GetAllOrganisation.CommandText = "select * from " + itemName;
+                    com_GetAllOrganisation.CommandText = "select * from " + selectedTable;
                     try
                     {
                         reader = com_GetOrganisationFields.ExecuteReader();
@@ -225,22 +250,22 @@ namespace AdressbuckWPF
                     {
                         MessageBox.Show(ex.Message);
                     }
-                    
-                    FillDataGrid(com_GetAllOrganisation);
+
+                    FillDataGrid(dataGridOutput,com_GetAllOrganisation);
                     
                     break;
                 default:
                     break;
             }
 
-            fields.Clear();
+            mitarbeiterColumnNames.Clear();
+            organisationColumnNames.Clear();
 
-            
             while (reader.Read())
             {
                 string value = reader.GetString(0);
 
-                if(comboBox1.SelectedItem.ToString() == "Mitarbeiter")
+                if (selectedTable == "Mitarbeiter")
                 {
                     mitarbeiterColumnNames.Add(value);
                 }
@@ -248,12 +273,10 @@ namespace AdressbuckWPF
                 {
                     organisationColumnNames.Add(value);
                 }
-                fields.Add(value);
+
             }
 
-            availableFields.Clear();
-            availableFields.AddRange(fields);
-
+            InitiateInputBoxes();
             try
             {
                 reader.Close();
@@ -262,130 +285,54 @@ namespace AdressbuckWPF
             {
                 MessageBox.Show(ex.Message);                
             }
-            
-
-            AddSearchGroup();
 
         }
 
 
 
-       
-        private int GetEmptyComboBoxes(Search search)
-        {
-            int emptyCounts = 0;
-            foreach (Search item in searchGroups)
-            {
-                if (item.GetComboBox().SelectedItem == null)
-                    emptyCounts++;
-            }
 
-            return emptyCounts;
-        }
-
-
-
-
-        public void OnRemoveButtonClicked(Search _search)
-        {
-            
-            if (GetEmptyComboBoxes(_search) <= 1 && _search.GetComboBox().SelectedItem == null)
-                return;
-            RemoveSearchGroup(_search);
-        }
-
-
-
-
-        public void OnComboBoxClosed(Search search)
-        {
-            availableFields.Remove(search.GetComboBox().SelectedItem.ToString());
-
-            if (GetEmptyComboBoxes(search) > 0)
-                return;
-            
-            AddSearchGroup();
-            
-        }
-
-
-
-
-        private void AddSearchGroup()
-        {
-            if (availableFields.Count > 0)
-            {
-                Search search = new Search(OnRemoveButtonClicked, OnComboBoxClosed);
-                StackPanel_SearchGroup.Children.Add(search);
-                searchGroups.Add(search);
-                
-            }
-            
-        }
-
-
-
-        private void RemoveSearchGroup(Search search_)
-        {
-            StackPanel_SearchGroup.Children.Remove(search_);
-            searchGroups.Remove(search_);
-
-            if(search_.comboBoxElement.SelectedItem != null)
-            {
-                availableFields.Add(search_.comboBoxElement.SelectedItem.ToString());
-            }
-            
-        }
-
-
-
-        private void RemoveAllSearchGroups()
-        {            
-            StackPanel_SearchGroup.Children.Clear();
-            searchGroups.Clear();
-        }
-        
 
 
         private string BuildSelectString()
         {
-            StringBuilder sb = new StringBuilder("select * from " + comboBox1.SelectedItem.ToString());
+            StringBuilder sb = new StringBuilder("select * from " + selectedTable+" where ");
+            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
 
-            for (int i = 0; i < searchGroups.Count; i++)
+            foreach(InputBox item in inputBoxes)
             {
-                if(searchGroups[i].comboBoxElement.SelectedItem != null)
+                if (item.TextChanged)
                 {
+                    keyValuePairs.Add(item.GetLabel(), item.GetInputText());
+                }
+            }
+
+            
+            for(int i = 0; i < keyValuePairs.Count; i++)
+            {
+                if (GetDBEntriesCount(selectedTable,keyValuePairs.ElementAt(i).Key,keyValuePairs.ElementAt(i).Value) == 0){
                     if (i == 0)
                     {
-                        if (searchGroups[i].textBoxElement.Text != string.Empty)
-                        {
-                            if(GetDBEntriesCount(comboBox1.SelectedItem.ToString() , searchGroups[i].GetComboBox().SelectedItem.ToString(), searchGroups[i].textBoxElement.Text) > 0)
-                            {
-                                sb.Append(" where " + searchGroups[i].comboBoxElement.SelectedItem.ToString() + " like '" + searchGroups[i].textBoxElement.Text + "'");
-                            }
-                            else 
-                            {
-                                sb.Append(" where " + searchGroups[i].comboBoxElement.SelectedItem.ToString() + " like '" + searchGroups[i].textBoxElement.Text + "%'");
-                            }
-
-                            
-                        }
+                        sb.Append(keyValuePairs.ElementAt(i).Key + " like '" + keyValuePairs.ElementAt(i).Value + "%' ");
                     }
                     else
                     {
-                        if (GetDBEntriesCount(comboBox1.SelectedItem.ToString(), searchGroups[i].GetComboBox().SelectedItem.ToString(), searchGroups[i].textBoxElement.Text) > 0)
-                        {
-                            sb.Append(" and " + searchGroups[i].comboBoxElement.SelectedItem.ToString() + " like '" + searchGroups[i].textBoxElement.Text + "'");
-                        }
-                        else
-                        {
-                            sb.Append(" and " + searchGroups[i].comboBoxElement.SelectedItem.ToString() + " like '" + searchGroups[i].textBoxElement.Text + "%'");
-                        }
+                        sb.Append("and " + keyValuePairs.ElementAt(i).Key + " like '" + keyValuePairs.ElementAt(i).Value + "%'");
                     }
-                }               
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        sb.Append(keyValuePairs.ElementAt(i).Key + " like '" + keyValuePairs.ElementAt(i).Value + "' ");
+                    }
+                    else
+                    {
+                        sb.Append("and " + keyValuePairs.ElementAt(i).Key + " like '" + keyValuePairs.ElementAt(i).Value + "'");
+                    }
+                }
                 
             }
-            
+
 
             return sb.ToString();
         }
@@ -394,52 +341,52 @@ namespace AdressbuckWPF
 
         private void BuildInsertString()
         {
-            if(comboBox1.SelectedItem == null)
-            {
-                return;
-            }
-            StringBuilder insertString = new StringBuilder("Insert into "+comboBox1.SelectedItem);
-            StringBuilder columnNames = new StringBuilder();
-            StringBuilder values = new StringBuilder();
+            //if(comboBox1.SelectedItem == null)
+            //{
+            //    return;
+            //}
+            //StringBuilder insertString = new StringBuilder("Insert into "+comboBox1.SelectedItem);
+            //StringBuilder columnNames = new StringBuilder();
+            //StringBuilder values = new StringBuilder();
 
-            for(int i = 0; i < searchGroups.Count; i++)
-            {
-                if (searchGroups[i].GetComboBox().SelectedItem == null)
-                    continue;
-                if (i > 0)
-                {
-                    columnNames.Append(",");
-                    columnNames.Append("'"+searchGroups[i].GetComboBox().SelectedItem.ToString()+ "'");
+            //for(int i = 0; i < searchGroups.Count; i++)
+            //{
+            //    if (searchGroups[i].GetComboBox().SelectedItem == null)
+            //        continue;
+            //    if (i > 0)
+            //    {
+            //        columnNames.Append(",");
+            //        columnNames.Append("'"+searchGroups[i].GetComboBox().SelectedItem.ToString()+ "'");
 
-                }
-                else
-                {
-                    columnNames.Append("'"+searchGroups[i].GetComboBox().SelectedItem.ToString()+ "'");
-                }
+            //    }
+            //    else
+            //    {
+            //        columnNames.Append("'"+searchGroups[i].GetComboBox().SelectedItem.ToString()+ "'");
+            //    }
                 
-            }
+            //}
 
 
-            for (int i = 0; i < searchGroups.Count; i++)
-            {
-                if (searchGroups[i].GetComboBox().SelectedItem == null)
-                    continue;
-                if (i > 0)
-                {
-                    values.Append(",");
-                    values.Append("'"+searchGroups[i].GetTextBox().Text+ "'");
+            //for (int i = 0; i < searchGroups.Count; i++)
+            //{
+            //    if (searchGroups[i].GetComboBox().SelectedItem == null)
+            //        continue;
+            //    if (i > 0)
+            //    {
+            //        values.Append(",");
+            //        values.Append("'"+searchGroups[i].GetTextBox().Text+ "'");
                     
 
-                }
-                else
-                {
-                    values.Append("'"+searchGroups[i].GetTextBox().Text+ "'");
-                }
+            //    }
+            //    else
+            //    {
+            //        values.Append("'"+searchGroups[i].GetTextBox().Text+ "'");
+            //    }
 
-            }
+            //}
 
-            insertString.Append("(" + columnNames.ToString() + ") VALUES (" + values.ToString()+")");
-            com_insert.CommandText = insertString.ToString();
+            //insertString.Append("(" + columnNames.ToString() + ") VALUES (" + values.ToString()+")");
+            //com_insert.CommandText = insertString.ToString();
 
 
 
@@ -538,7 +485,7 @@ namespace AdressbuckWPF
             else
             {
                 com_select.CommandText = BuildSelectString();
-                FillDataGrid(com_select);
+                FillDataGrid(dataGridOutput, com_select);
             }
                 
                  
@@ -563,11 +510,11 @@ namespace AdressbuckWPF
                     
                     if(comboBox1.SelectedItem.ToString() == "Mitarbeiter")
                     {
-                        FillDataGrid(com_GetAllMitarbeiter);
+                        FillDataGrid(dataGridOutput, com_GetAllMitarbeiter);
                     }
                     else
                     {
-                        FillDataGrid(com_GetAllOrganisation);
+                        FillDataGrid(dataGridOutput, com_GetAllOrganisation);
                     }
                     
                 }
@@ -585,7 +532,7 @@ namespace AdressbuckWPF
 
         private void Button3_Click(object sender, RoutedEventArgs e)
         {   
-            if(dataGrid.SelectedItem == null && dataGrid.SelectedItem.GetType() == typeof(DataRowView))
+            if(dataGridOutput.SelectedItem == null && dataGridOutput.SelectedItem.GetType() == typeof(DataRowView))
             {
                 MessageBox.Show("Bitte die zu löschende Zeile auswählen");
                 hilfeBox.Text = "Die zu löschende Zeile anklicken dann auf Eintrag löschen klicken";
@@ -594,14 +541,14 @@ namespace AdressbuckWPF
             {
                 if(comboBox1.SelectedItem.ToString() == "Mitarbeiter")
                 {
-                    DeleteMitarbeiterEntry(((DataRowView)dataGrid.SelectedItem).Row["ID"].ToString());
-                    FillDataGrid(com_GetAllMitarbeiter);
+                    DeleteMitarbeiterEntry(((DataRowView)dataGridOutput.SelectedItem).Row["ID"].ToString());
+                    FillDataGrid(dataGridOutput, com_GetAllMitarbeiter);
                 }
                 else
                 {
                     
-                    DeleteOrganisationEntry(((DataRowView)dataGrid.SelectedItem).Row["Name"].ToString());
-                    FillDataGrid(com_GetAllOrganisation);
+                    DeleteOrganisationEntry(((DataRowView)dataGridOutput.SelectedItem).Row["Name"].ToString());
+                    FillDataGrid(dataGridOutput, com_GetAllOrganisation);
                 }
 
                
@@ -614,25 +561,25 @@ namespace AdressbuckWPF
 
         private void Button4_Click(object sender, RoutedEventArgs e)
         {
-            if (dataGrid.SelectedItem == null)
-            {
-                MessageBox.Show("Bitte die zu löschende Zeile auswählen");
-            }
-            else
-            {
-                if (comboBox1.SelectedItem.ToString() == "Mitarbeiter")
-                {
-                    DeleteMitarbeiterEntry(((DataRowView)dataGrid.SelectedItem).Row["ID"].ToString());
-                    FillDataGrid(com_GetAllMitarbeiter);
-                }
-                else
-                {
-                    DeleteOrganisationEntry(((DataRowView)dataGrid.SelectedItem).Row["Name"].ToString());
-                    FillDataGrid(com_GetAllOrganisation);
-                }
+            //if (dataGrid.SelectedItem == null)
+            //{
+            //    MessageBox.Show("Bitte die zu löschende Zeile auswählen");
+            //}
+            //else
+            //{
+            //    if (comboBox1.SelectedItem.ToString() == "Mitarbeiter")
+            //    {
+            //        DeleteMitarbeiterEntry(((DataRowView)dataGrid.SelectedItem).Row["ID"].ToString());
+            //        FillDataGrid(com_GetAllMitarbeiter);
+            //    }
+            //    else
+            //    {
+            //        DeleteOrganisationEntry(((DataRowView)dataGrid.SelectedItem).Row["Name"].ToString());
+            //        FillDataGrid(com_GetAllOrganisation);
+            //    }
 
 
-            }
+            //}
 
         }
 
@@ -658,5 +605,7 @@ namespace AdressbuckWPF
             datagridRowDict.Add(e.Column.Header.ToString(), ((TextBox)e.EditingElement).Text);            
             
         }
+
+        
     }
 }

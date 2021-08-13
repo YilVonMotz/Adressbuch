@@ -1,4 +1,4 @@
-﻿<Window x:Class="AdressbuckWPF.MainWindow"
+﻿<Window x:Class="AdressbuchWPF.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,21 +14,19 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <DataGrid x:Name="dataGrid" Margin="10,167,10,10" RowEditEnding="DataGrid_RowEditEnding" CellEditEnding="DataGrid_CellEditEnding" Background="#FFE2E2E0">
 
-        </DataGrid>
         <StackPanel>
             <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
-                <ComboBox x:Name="comboBox1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="124" DropDownClosed="ComboBox1_DropDownClosed" Margin="10,10,0,0" ToolTip="Tabelle auswählen"/>
+                <ComboBox x:Name="comboBox1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="124" DropDownClosed="TableSelect_Dropdown" Margin="10,10,0,0" ToolTip="Tabelle auswählen"/>
                 <Rectangle Width="100"/>
                 <Button x:Name="button" Content="SUCHEN" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Background="#FFDDDDDD" Click="Button_Click_1"/>
                 <Button x:Name="button2" Content="EINTRAG ERSTELLEN" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Click="Button2_Click"/>
                 <Button x:Name="button3" Content="EINTRAG LÖSCHEN" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Click="Button3_Click"/>
             </StackPanel>
-            <GroupBox x:Name="groupBox" Header="Ausgewählte Elemente" Margin="10,10,10,0" Height="82" VerticalAlignment="Top">
-                <StackPanel x:Name="StackPanel_SearchGroup" Orientation="Horizontal" Margin="0,0,-2,0"/>
-            </GroupBox>
-            <TextBlock x:Name="hilfeBox" TextWrapping="Wrap" Height="36" Margin="10,0"/>
+            <StackPanel x:Name="StackPanel_InputBoxes" Orientation="Horizontal" Height="72" Margin="10,10,10,0"/>
+            <TextBlock x:Name="hilfeBox" TextWrapping="Wrap" Height="29" Margin="10,0"/>
+            <DataGrid x:Name="dataGridOutput"  RowEditEnding="DataGrid_RowEditEnding" CellEditEnding="DataGrid_CellEditEnding" Background="#FFE2E2E0" Height="261" Margin="10" VerticalAlignment="Center"/>
+
         </StackPanel>
 
 
