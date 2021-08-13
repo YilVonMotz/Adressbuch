@@ -85,7 +85,7 @@ namespace AdressbuckWPF
             comboBoxContent.Add("Organisation");
             comboBox1.ItemsSource = comboBoxContent;
 
-            
+            Console.WriteLine("UIAenderung");            
 
         }
 
