@@ -260,7 +260,7 @@ namespace AdressbuckWPF
             }
             catch(SQLiteException ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message);                
             }
             
 
@@ -533,7 +533,7 @@ namespace AdressbuckWPF
             if (comboBox1.SelectedItem == null)
             {
                 MessageBox.Show("Bitte erst Suchkontext auswählen");
-
+                hilfeBox.Text = "Tabelle auswählen, Suchwerte eingeben dann auf -SUCHEN- klicken. Groß und -Klein Schreibung beachten";
             }
             else
             {
@@ -551,7 +551,7 @@ namespace AdressbuckWPF
             if (comboBox1.SelectedItem == null)
             {
                 MessageBox.Show("Bitte erst Suchkontext auswählen");
-
+                hilfeBox.Text = "Tabelle wählen, die zu füllenden Felder auswählen dann auf -EINTRAG EINFÜGEN- klicken";
             }
             else
             {
@@ -585,9 +585,10 @@ namespace AdressbuckWPF
 
         private void Button3_Click(object sender, RoutedEventArgs e)
         {   
-            if(dataGrid.SelectedItem == null)
+            if(dataGrid.SelectedItem == null && dataGrid.SelectedItem.GetType() == typeof(DataRowView))
             {
                 MessageBox.Show("Bitte die zu löschende Zeile auswählen");
+                hilfeBox.Text = "Die zu löschende Zeile anklicken dann auf Eintrag löschen klicken";
             }
             else
             {
@@ -598,6 +599,7 @@ namespace AdressbuckWPF
                 }
                 else
                 {
+                    
                     DeleteOrganisationEntry(((DataRowView)dataGrid.SelectedItem).Row["Name"].ToString());
                     FillDataGrid(com_GetAllOrganisation);
                 }
