@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{7E3E2809-5928-413E-BF44-B9089B6E89C6}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>AdressbuckWPF</RootNamespace>
-    <AssemblyName>AdressbuckWPF</AssemblyName>
+    <RootNamespace>AdressbuchWPF</RootNamespace>
+    <AssemblyName>AdressbuchWPF</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -99,7 +99,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Adressbuch.db" />
+    <Content Include="Adressbuch.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

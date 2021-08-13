@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.1433
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdressbuchWPF", "AdressbuckWPF\AdressbuchWPF.csproj", "{7E3E2809-5928-413E-BF44-B9089B6E89C6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdressbuchWPF", "AdressbuchWPF\AdressbuchWPF.csproj", "{7E3E2809-5928-413E-BF44-B9089B6E89C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

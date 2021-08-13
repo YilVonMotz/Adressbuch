@@ -33,6 +33,7 @@ namespace AdressbuckWPF
         private List<string> organisationColumnNames = new List<string>();
         private List<string> fields = new List<string>();
         public static List<string> availableFields = new List<string>();
+        private Dictionary<string, string> datagridRowDict = new Dictionary<string, string>();
 
         private List<Search> searchGroups = new List<Search>();
 
@@ -295,9 +296,6 @@ namespace AdressbuckWPF
 
         public void OnComboBoxClosed(Search search)
         {
-            //if (search.GetTextBox().Text == string.Empty)
-            //    return;
-
             availableFields.Remove(search.GetComboBox().SelectedItem.ToString());
 
             if (GetEmptyComboBoxes(search) > 0)
@@ -308,21 +306,13 @@ namespace AdressbuckWPF
         }
 
 
-        
-        public int OnSearchTextEntry(Search search)
-        {
-            int result =  GetDBEntriesCount(comboBox1.SelectedItem.ToString(),search.GetComboBox().SelectedItem.ToString(), search.GetTextBox().Text );
-            search.GetTextBlock().Text = result.ToString()+" Treffer";
-            return result;
-        }
-
 
 
         private void AddSearchGroup()
         {
             if (availableFields.Count > 0)
             {
-                Search search = new Search(OnRemoveButtonClicked, OnComboBoxClosed, OnSearchTextEntry);
+                Search search = new Search(OnRemoveButtonClicked, OnComboBoxClosed);
                 StackPanel_SearchGroup.Children.Add(search);
                 searchGroups.Add(search);
                 
@@ -488,60 +478,44 @@ namespace AdressbuckWPF
         }
 
 
-        private void ModifyEntry()
-        {
-            List<string> rowItems = new List<string>();
-            object[] rowObjects = ((DataRowView)dataGrid.SelectedItem).Row.ItemArray;
+        private void ModifyEntry(Dictionary<string, string> rowElements,string primaryKey)
+        {            
             StringBuilder stringBuilder;
-
-            foreach(Object item in rowObjects)
-            {
-                rowItems.Add(item.ToString());
-            }
+            string tableName = comboBox1.SelectedItem.ToString();
+            string pKeyValue = primaryKey;
             
-            if(comboBox1.SelectedItem.ToString() == "Mitarbeiter")
-            {
-                string pKeyValue = ((DataRowView)dataGrid.SelectedItem).Row["ID"].ToString();
-                stringBuilder = new StringBuilder("Update Mitarbeiter SET ");
+            
+            stringBuilder = new StringBuilder("Update "+tableName+" SET ");
 
-                for(int i = 0; i < rowItems.Count; i++)
+            for(int i = 0; i < rowElements.Count; i++)
+            {
+                if (i < rowElements.Count - 1)
                 {
-                    if (i < organisationColumnNames.Count - 1)
-                    {
-                        stringBuilder.Append(mitarbeiterColumnNames[i] + "='" + rowItems[i].ToString() + "',");
-                    }
-                    else
-                    {
-                        stringBuilder.Append(mitarbeiterColumnNames[i] + "='" + rowItems[i].ToString() + "'");
-                    }
+                    stringBuilder.Append( rowElements.Keys.ElementAt(i)+ "='" + rowElements.Values.ElementAt(i) + "',");
                 }
-                
+                else
+                {
+                    stringBuilder.Append(rowElements.Keys.ElementAt(i) + "='" + rowElements.Values.ElementAt(i) + "'");
+                }
+            }
+
+
+
+            if (tableName == "Mitarbeiter")
+            {
+                stringBuilder.Append(" where ID='" + pKeyValue+"'");
             }
             else
             {
-                string pKeyValue = ((DataRowView)dataGrid.SelectedItem).Row["Name"].ToString();
-                stringBuilder = new StringBuilder("Update Organisation SET ");
-
-                for (int i = 0; i < rowItems.Count; i++)
-                {
-                    if (i < organisationColumnNames.Count - 1)
-                    {
-                        stringBuilder.Append(organisationColumnNames[i] + "='" + rowItems[i].ToString() + "',");
-                    }
-                    else
-                    {
-                        stringBuilder.Append(organisationColumnNames[i] + "='" + rowItems[i].ToString() + "'");
-                    }
-                    
-                }
-
-            }
+                stringBuilder.Append(" where name=" + pKeyValue+"'");
+            }          
+            
 
             try
             {
                 com_update.CommandText = stringBuilder.ToString();
                 com_update.ExecuteNonQuery();
-                FillDataGrid(com_update);
+                
             }catch(SQLiteException ex)
             {
                 MessageBox.Show(ex.Message);
@@ -659,13 +633,24 @@ namespace AdressbuckWPF
 
         private void DataGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
-            //int itemCount = ((DataRowView)((DataGrid)sender).SelectedItem).Row.ItemArray.Length;
-            //for (int i = 0; i < itemCount; i++)
-            //{
-            //    Console.WriteLine(((DataRowView)((DataGrid)sender).SelectedItem).Row[i]);
-            //}
+            if (comboBox1.SelectedItem.ToString() == "Mitarbeiter")
+            {
+                ModifyEntry(datagridRowDict, ((DataRowView)e.Row.Item).Row["ID"].ToString());
+            }
+            else
+            {
+                ModifyEntry(datagridRowDict, ((DataRowView)e.Row.Item).Row["Name"].ToString());
+            }
+            datagridRowDict.Clear();
+            
+        }
 
-            ModifyEntry();
+        
+
+        private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {            
+            Console.WriteLine(e.Column.Header.ToString()+"="+((TextBox)e.EditingElement).Text);
+            datagridRowDict.Add(e.Column.Header.ToString(), ((TextBox)e.EditingElement).Text);            
             
         }
     }

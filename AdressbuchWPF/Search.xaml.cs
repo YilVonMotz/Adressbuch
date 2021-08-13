@@ -21,12 +21,11 @@ namespace AdressbuckWPF
     /// </summary>
     public partial class Search : UserControl
     {
-        public Search(RemoveButtonClickedDel removeButtonClickedDel, ComboBoxClosedDel dropDownClosedDel, TextBoxEntryDel textBoxEntryDel)
+        public Search(RemoveButtonClickedDel removeButtonClickedDel, ComboBoxClosedDel dropDownClosedDel)
         {
             InitializeComponent();
             OnRemoveButtonClicked += removeButtonClickedDel;
             OnDropDownClosed += dropDownClosedDel;
-            OnTextBoxEntry += textBoxEntryDel;
             comboBoxElement.ItemsSource = MainWindow.availableFields;
             
         }
@@ -34,16 +33,13 @@ namespace AdressbuckWPF
 
         public ComboBox GetComboBox() { return this.comboBoxElement;  }        
         public TextBox GetTextBox() { return this.textBoxElement;  }
-        public TextBlock GetTextBlock() { return this.textBlockElement; }
+        
                
         public delegate void RemoveButtonClickedDel(Search search);
         public RemoveButtonClickedDel OnRemoveButtonClicked;
 
         public delegate void ComboBoxClosedDel(Search search);
         public ComboBoxClosedDel OnDropDownClosed;
-
-        public delegate int TextBoxEntryDel(Search search);
-        public TextBoxEntryDel OnTextBoxEntry;
 
         public delegate void SelectionChangedDel(ComboBox comboBox);
         public static SelectionChangedDel OnSelectionChanged; 
@@ -82,7 +78,7 @@ namespace AdressbuckWPF
         {
             if (comboBoxElement.SelectedItem == null)
                 return;
-            OnTextBoxEntry(this);
+            
         }
 
 
