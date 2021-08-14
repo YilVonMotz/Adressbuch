@@ -306,40 +306,42 @@ namespace AdressbuchWPF
 
             foreach(InputBox item in inputBoxes)
             {
-                if (item.TextChanged)
+                if (item.TextChanged && item.GetInputText()!=string.Empty)
                 {
                     keyValuePairs.Add(item.GetLabel(), item.GetInputText());
                 }
             }
 
             
-            for(int i = 0; i < keyValuePairs.Count; i++)
+
+            for (int i = 0; i < keyValuePairs.Count; i++)
             {
                 string key = keyValuePairs.ElementAt(i).Key;
                 string value = keyValuePairs.ElementAt(i).Value;
 
-
-                if(value != string.Empty)
+                if (i == 0)
                 {
                     sb.Append(" where ");
-
-                    if (i > 0)
-                    {
-                        sb.Append(" AND ");
-                    }
-
-
-                    if (GetDBEntriesCount(selectedTable, key, value) == 0)
-                    {
-                        sb.Append(key + " like '" + value + "%' ");
-
-                    }
-                    else
-                    {
-                        sb.Append(key + " like '" + value + "' ");
-
-                    }
                 }
+
+                if (i > 0)
+                {
+                    sb.Append(" AND ");
+                }
+
+                                  
+
+
+                if (GetDBEntriesCount(selectedTable, key, value) == 0)
+                {
+                    sb.Append(key + " like '" + value + "%' ");
+
+                }
+                else
+                {
+                    sb.Append(key + " like '" + value + "' ");
+
+                }                
                
                 
             }
