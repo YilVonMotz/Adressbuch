@@ -387,10 +387,19 @@ namespace AdressbuchWPF
 
        
 
-        private void DeleteMitarbeiterEntry(string ID)
+        private void DeleteEntry(string pKvalue)
         {
-            StringBuilder deleteString = new StringBuilder("delete from Mitarbeiter where ID = '" +ID+"'");
-            com_delete.CommandText = deleteString.ToString();
+            StringBuilder deleteEntryString = new StringBuilder();
+            if (selectedTable == "Mitarbeiter")
+            {
+                deleteEntryString.Append("delete from Mitarbeiter where ID = ' "+pKvalue+" '");
+            }
+            else
+            {
+                deleteEntryString.Append("delete from Organisation where Name = ' " + pKvalue + " '");
+            }
+            
+            com_delete.CommandText = deleteEntryString.ToString();
 
             try
             {
@@ -405,20 +414,6 @@ namespace AdressbuchWPF
 
 
 
-        private void DeleteOrganisationEntry(string name)
-        {
-            StringBuilder deleteString = new StringBuilder("delete from Organisation where name = '" + name + "'");
-            com_delete.CommandText = deleteString.ToString();
-
-            try
-            {
-                com_delete.ExecuteNonQuery();
-            }
-            catch (SQLiteException ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
 
 
         private void ModifyEntry(Dictionary<string, string> rowElements,string primaryKey)
@@ -532,49 +527,24 @@ namespace AdressbuchWPF
             }
             else
             {
-                if(comboBox1.SelectedItem.ToString() == "Mitarbeiter")
+                if (selectedTable == "Mitarbeiter")
                 {
-                    DeleteMitarbeiterEntry(((DataRowView)dataGridOutput.SelectedItem).Row["ID"].ToString());
+                    DeleteEntry(((DataRowView)dataGridOutput.SelectedItem).Row["ID"].ToString());
                     FillDataGrid(dataGridOutput, com_GetAllMitarbeiter);
                 }
                 else
                 {
-                    
-                    DeleteOrganisationEntry(((DataRowView)dataGridOutput.SelectedItem).Row["Name"].ToString());
+                    DeleteEntry(((DataRowView)dataGridOutput.SelectedItem).Row["Name"].ToString());
                     FillDataGrid(dataGridOutput, com_GetAllOrganisation);
                 }
 
-               
+
             }
             
         }
 
 
-
-
-        private void Button4_Click(object sender, RoutedEventArgs e)
-        {
-            //if (dataGrid.SelectedItem == null)
-            //{
-            //    MessageBox.Show("Bitte die zu löschende Zeile auswählen");
-            //}
-            //else
-            //{
-            //    if (comboBox1.SelectedItem.ToString() == "Mitarbeiter")
-            //    {
-            //        DeleteMitarbeiterEntry(((DataRowView)dataGrid.SelectedItem).Row["ID"].ToString());
-            //        FillDataGrid(com_GetAllMitarbeiter);
-            //    }
-            //    else
-            //    {
-            //        DeleteOrganisationEntry(((DataRowView)dataGrid.SelectedItem).Row["Name"].ToString());
-            //        FillDataGrid(com_GetAllOrganisation);
-            //    }
-
-
-            //}
-
-        }
+       
 
         private void DataGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {

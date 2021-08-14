@@ -15,7 +15,7 @@
         </Grid.Background>
 
 
-        <StackPanel>
+        <StackPanel Height="161" VerticalAlignment="Top">
             <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
                 <ComboBox x:Name="comboBox1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="124" DropDownClosed="TableSelect_Dropdown" Margin="10,10,0,0" ToolTip="Tabelle auswählen"/>
                 <Rectangle Width="100"/>
@@ -25,11 +25,11 @@
             </StackPanel>
             <StackPanel x:Name="StackPanel_InputBoxes" Orientation="Horizontal" Height="72" Margin="10,10,10,0"/>
             <TextBlock x:Name="hilfeBox" TextWrapping="Wrap" Height="29" Margin="10,0"/>
-            <DataGrid x:Name="dataGridOutput"  RowEditEnding="DataGrid_RowEditEnding" CellEditEnding="DataGrid_CellEditEnding" Background="#FFE2E2E0" Height="261" Margin="10" VerticalAlignment="Center"/>
+
 
         </StackPanel>
 
-
+        <DataGrid x:Name="dataGridOutput"  RowEditEnding="DataGrid_RowEditEnding" CellEditEnding="DataGrid_CellEditEnding" Background="#FFE2E2E0" Margin="10,161,10,10"/>
 
     </Grid>
 </Window>
