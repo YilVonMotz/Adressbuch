@@ -392,11 +392,11 @@ namespace AdressbuchWPF
             StringBuilder deleteEntryString = new StringBuilder();
             if (selectedTable == "Mitarbeiter")
             {
-                deleteEntryString.Append("delete from Mitarbeiter where ID = ' "+pKvalue+" '");
+                deleteEntryString.Append("delete from Mitarbeiter where ID = '"+pKvalue+"'");
             }
             else
             {
-                deleteEntryString.Append("delete from Organisation where Name = ' " + pKvalue + " '");
+                deleteEntryString.Append("delete from Organisation where Name = '" + pKvalue + "'");
             }
             
             com_delete.CommandText = deleteEntryString.ToString();
