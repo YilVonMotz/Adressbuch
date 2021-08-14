@@ -416,14 +416,13 @@ namespace AdressbuchWPF
 
 
 
-        private void ModifyEntry(Dictionary<string, string> rowElements,string primaryKey)
+        private void ModifyEntry(Dictionary<string, string> rowElements,string pKeyValue)
         {            
             StringBuilder stringBuilder;
-            string tableName = comboBox1.SelectedItem.ToString();
-            string pKeyValue = primaryKey;
             
             
-            stringBuilder = new StringBuilder("Update "+tableName+" SET ");
+            
+            stringBuilder = new StringBuilder("Update "+selectedTable+" SET ");
 
             for(int i = 0; i < rowElements.Count; i++)
             {
@@ -438,8 +437,7 @@ namespace AdressbuchWPF
             }
 
 
-
-            if (tableName == "Mitarbeiter")
+            if (selectedTable == "Mitarbeiter")
             {
                 stringBuilder.Append(" where ID='" + pKeyValue+"'");
             }
@@ -520,7 +518,7 @@ namespace AdressbuchWPF
 
         private void Button3_Click(object sender, RoutedEventArgs e)
         {   
-            if(dataGridOutput.SelectedItem == null && dataGridOutput.SelectedItem.GetType() == typeof(DataRowView))
+            if(dataGridOutput.SelectedItem == null || dataGridOutput.SelectedItem.GetType() != typeof(DataRowView))
             {
                 MessageBox.Show("Bitte die zu löschende Zeile auswählen");
                 hilfeBox.Text = "Die zu löschende Zeile anklicken dann auf Eintrag löschen klicken";
