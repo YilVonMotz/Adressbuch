@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AdressbuckWPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="876.829" SizeToContent="Width">
+        Title="MainWindow" Height="481.903" Width="876.829" SizeToContent="Width" Closing="Window_Closing">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
+        </Grid.ColumnDefinitions>
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                 <GradientStop Color="#FF45AC8B" Offset="0"/>
@@ -15,21 +19,17 @@
         </Grid.Background>
 
 
-        <StackPanel Height="161" VerticalAlignment="Top">
-            <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
-                <ComboBox x:Name="comboBox1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="124" DropDownClosed="TableSelect_Dropdown" Margin="10,10,0,0" ToolTip="Tabelle auswählen"/>
-                <Rectangle Width="100"/>
-                <Button x:Name="button" Content="SUCHEN" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Background="#FFDDDDDD" Click="Button_Click_1"/>
-                <Button x:Name="button2" Content="EINTRAG ERSTELLEN" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Click="Button2_Click"/>
-                <Button x:Name="button3" Content="EINTRAG LÖSCHEN" Width="123" Margin="10,10,0,0" HorizontalAlignment="Left" Click="Button3_Click"/>
-            </StackPanel>
-            <StackPanel x:Name="StackPanel_InputBoxes" Orientation="Horizontal" Height="72" Margin="10,10,10,0"/>
+        <StackPanel Height="161" VerticalAlignment="Top" Margin="0,0,153,0">
+            <ComboBox x:Name="comboBox1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="124" DropDownClosed="TableSelect_Dropdown" Margin="10,10,0,0" ToolTip="Tabelle auswählen"/>
+            <StackPanel x:Name="StackPanel_InputBoxes" Orientation="Horizontal" Height="72" Margin="10,10,86,0"/>
             <TextBlock x:Name="hilfeBox" TextWrapping="Wrap" Height="29" Margin="10,0"/>
-
-
+        </StackPanel>
+        <StackPanel Margin="0,39,5,0" Height="63" VerticalAlignment="Top" HorizontalAlignment="Right" Width="148">
+            <Button x:Name="button" Content="SUCHEN" Margin="0,10,14,0" Background="#FFDDDDDD" Click="Button_Click_1" HorizontalAlignment="Right" Width="123"/>
+            <Button x:Name="button2" Content="EINTRAG ERSTELLEN" Width="123" Margin="0,10,14,0" HorizontalAlignment="Right" Click="Button2_Click"/>
         </StackPanel>
 
-        <DataGrid x:Name="dataGridOutput"  RowEditEnding="DataGrid_RowEditEnding" CellEditEnding="DataGrid_CellEditEnding" Background="#FFE2E2E0" Margin="10,161,10,10"/>
-
+        <DataGrid x:Name="dataGridOutput"  RowEditEnding="DataGrid_RowEditEnding" CellEditEnding="DataGrid_CellEditEnding" Background="#FFE2E2E0" Margin="10,161,10,37"/>
+        <Button x:Name="button3" Content="EINTRAG LÖSCHEN" Width="123" Margin="10,0,0,10" HorizontalAlignment="Left" Click="Button3_Click" Height="27" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

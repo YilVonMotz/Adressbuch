@@ -9,7 +9,7 @@
     <Grid>
         <StackPanel>
             <TextBlock x:Name="InputBox_TextBlock" TextWrapping="Wrap" Text="TextBlock" Height="23" Foreground="White"/>
-            <TextBox x:Name="InputBox_TextBox" Height="32" TextWrapping="Wrap" LostFocus="InputBox_TextBox_LostFocus"/>
+            <TextBox x:Name="InputBox_TextBox" Height="32" TextWrapping="Wrap" LostFocus="InputBox_TextBox_LostFocus" KeyDown="InputBox_TextBox_KeyDown" />
 
         </StackPanel>
 

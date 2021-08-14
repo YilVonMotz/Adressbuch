@@ -24,9 +24,14 @@ namespace AdressbuchWPF
         private string label;
         public bool TextChanged { get; set; }
 
-        public InputBox()
+        public delegate void OnEnterKeyDel();
+        public OnEnterKeyDel OnEnterKey;
+
+
+        public InputBox(OnEnterKeyDel onEnterKeyDel)
         {
             InitializeComponent();
+            OnEnterKey += onEnterKeyDel;
         }
 
         public void SetLabel(string text)
@@ -43,13 +48,34 @@ namespace AdressbuchWPF
 
         public string GetInputText()
         {
-            return value;
+            if (TextChanged)
+            {
+                return value;
+            }
+            else
+            {
+                return string.Empty;
+            }
+            
         }
 
         private void InputBox_TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             TextChanged = true;
-            value = ((TextBox)sender).Text;            
+            value = ((TextBox)sender).Text;
+            OnEnterKey();
+            
+        }
+
+        private void InputBox_TextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {
+                TextChanged = true;
+                value = ((TextBox)sender).Text;
+                OnEnterKey();
+            }
+            
         }
     }
 }

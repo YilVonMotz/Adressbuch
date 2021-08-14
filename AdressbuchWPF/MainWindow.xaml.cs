@@ -91,7 +91,7 @@ namespace AdressbuchWPF
 
         }
 
-
+        
 
         private void InitializeCommands()
         {           
@@ -182,13 +182,19 @@ namespace AdressbuchWPF
 
 
 
+        public void OnInputBoxEnterKey()
+        {
+            Search();
+        }
+
+
         private void InitiateInputBoxes()
         {
             if (selectedTable == "Mitarbeiter")
             {
                 for(int i = 0; i < mitarbeiterColumnNames.Count; i++)
                 {
-                    InputBox inputBox = new InputBox();
+                    InputBox inputBox = new InputBox(OnInputBoxEnterKey);
                     inputBox.SetLabel(mitarbeiterColumnNames[i]);                    
                     StackPanel_InputBoxes.Children.Add(inputBox);
                     inputBoxes.Add(inputBox);
@@ -198,7 +204,7 @@ namespace AdressbuchWPF
             {
                 for (int i = 0; i < organisationColumnNames.Count; i++)
                 {
-                    InputBox inputBox = new InputBox();
+                    InputBox inputBox = new InputBox(OnInputBoxEnterKey);
                     inputBox.SetLabel(organisationColumnNames[i]);
                     StackPanel_InputBoxes.Children.Add(inputBox);
                     inputBoxes.Add(inputBox);
@@ -294,8 +300,8 @@ namespace AdressbuchWPF
 
 
         private string BuildSelectString()
-        {
-            StringBuilder sb = new StringBuilder("select * from " + selectedTable+" where ");
+        {            
+            StringBuilder sb = new StringBuilder("select * from " + selectedTable );
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
 
             foreach(InputBox item in inputBoxes)
@@ -309,32 +315,37 @@ namespace AdressbuchWPF
             
             for(int i = 0; i < keyValuePairs.Count; i++)
             {
-                if (GetDBEntriesCount(selectedTable,keyValuePairs.ElementAt(i).Key,keyValuePairs.ElementAt(i).Value) == 0){
-                    if (i == 0)
-                    {
-                        sb.Append(keyValuePairs.ElementAt(i).Key + " like '" + keyValuePairs.ElementAt(i).Value + "%' ");
-                    }
-                    else
-                    {
-                        sb.Append("and " + keyValuePairs.ElementAt(i).Key + " like '" + keyValuePairs.ElementAt(i).Value + "%'");
-                    }
-                }
-                else
+                string key = keyValuePairs.ElementAt(i).Key;
+                string value = keyValuePairs.ElementAt(i).Value;
+
+
+                if(value != string.Empty)
                 {
-                    if (i == 0)
+                    sb.Append(" where ");
+
+                    if (i > 0)
                     {
-                        sb.Append(keyValuePairs.ElementAt(i).Key + " like '" + keyValuePairs.ElementAt(i).Value + "' ");
+                        sb.Append(" AND ");
+                    }
+
+
+                    if (GetDBEntriesCount(selectedTable, key, value) == 0)
+                    {
+                        sb.Append(key + " like '" + value + "%' ");
+
                     }
                     else
                     {
-                        sb.Append("and " + keyValuePairs.ElementAt(i).Key + " like '" + keyValuePairs.ElementAt(i).Value + "'");
+                        sb.Append(key + " like '" + value + "' ");
+
                     }
                 }
+               
                 
             }
 
-
             return sb.ToString();
+            
         }
         
 
@@ -349,6 +360,7 @@ namespace AdressbuchWPF
             StringBuilder values = new StringBuilder();
             StringBuilder labels = new StringBuilder();
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+            
 
             foreach(InputBox item in inputBoxes)
             {
@@ -361,21 +373,30 @@ namespace AdressbuchWPF
 
             for (int i = 0; i < keyValuePairs.Count; i++)
             {
+                string value = keyValuePairs.ElementAt(i).Value;
+                string label = keyValuePairs.ElementAt(i).Key;
+
+                if(value != string.Empty)
+                {
+                    if (i > 0)
+                    {
+
+                        values.Append(",");
+                        values.Append("'" + value + "'");
+
+                        labels.Append(",");
+                        labels.Append("'" + label + "'");
+
+                    }
+                    else
+                    {
+
+                        labels.Append("'" + label + "'");
+                        values.Append("'" + value + "'");
+
+                    }
+                }
                 
-                if (i > 0)
-                {
-                    values.Append(",");
-                    values.Append("'" + keyValuePairs.ElementAt(i).Value+ "'");
-
-                    labels.Append(",");
-                    labels.Append("'" + keyValuePairs.ElementAt(i).Key + "'");
-
-                }
-                else
-                {
-                    values.Append("'" + keyValuePairs.ElementAt(i).Value + "'");
-                    labels.Append("'" + keyValuePairs.ElementAt(i).Key + "'");
-                }
 
             }
            
@@ -418,62 +439,80 @@ namespace AdressbuchWPF
 
         private void ModifyEntry(Dictionary<string, string> rowElements,string pKeyValue)
         {            
-            StringBuilder stringBuilder;
-            
-            
-            
-            stringBuilder = new StringBuilder("Update "+selectedTable+" SET ");
+            StringBuilder stringBuilder = new StringBuilder("Update "+selectedTable+" SET ");
+            StringBuilder stringBuilder2 = new StringBuilder();
 
             for(int i = 0; i < rowElements.Count; i++)
             {
-                if (i < rowElements.Count - 1)
+                string value = rowElements.ElementAt(i).Value;
+                string key = rowElements.ElementAt(i).Key;
+
+                if(value == string.Empty)
                 {
-                    stringBuilder.Append( rowElements.Keys.ElementAt(i)+ "='" + rowElements.Values.ElementAt(i) + "',");
+                    continue;
+                }
+                if (i < rowElements.Count - 1)
+                {                    
+                    stringBuilder2.Append( key+ "='" + value + "',");
                 }
                 else
                 {
-                    stringBuilder.Append(rowElements.Keys.ElementAt(i) + "='" + rowElements.Values.ElementAt(i) + "'");
+                    stringBuilder2.Append(key + "='" + value + "'");
                 }
             }
 
 
-            if (selectedTable == "Mitarbeiter")
+            if (stringBuilder2.ToString() != string.Empty)
             {
-                stringBuilder.Append(" where ID='" + pKeyValue+"'");
-            }
-            else
-            {
-                stringBuilder.Append(" where name=" + pKeyValue+"'");
-            }          
-            
+                stringBuilder.Append(stringBuilder2);
+                if (selectedTable == "Mitarbeiter")
+                {
+                    stringBuilder.Append(" where ID='" + pKeyValue + "'");
+                }
+                else
+                {
+                    stringBuilder.Append(" where name=" + pKeyValue + "'");
+                }
 
-            try
-            {
-                com_update.CommandText = stringBuilder.ToString();
-                com_update.ExecuteNonQuery();
-                
-            }catch(SQLiteException ex)
-            {
-                MessageBox.Show(ex.Message);
+
+                try
+                {
+                    com_update.CommandText = stringBuilder.ToString();
+                    com_update.ExecuteNonQuery();
+
+                }
+                catch (SQLiteException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
+            
             
         }
 
-
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void Search()
         {
+            string buildStr = BuildSelectString();
+
             if (comboBox1.SelectedItem == null)
             {
                 MessageBox.Show("Bitte erst Suchkontext auswählen");
                 hilfeBox.Text = "Tabelle auswählen, Suchwerte eingeben dann auf -SUCHEN- klicken. Groß und -Klein Schreibung beachten";
+            }else if(buildStr == string.Empty)
+            {
+                MessageBox.Show("Bitte Suchwerte eingeben");
             }
             else
             {
-                com_select.CommandText = BuildSelectString();
+                com_select.CommandText = buildStr;
                 FillDataGrid(dataGridOutput, com_select);
             }
-                
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+
+            Search();
                  
         }
 
@@ -488,13 +527,13 @@ namespace AdressbuchWPF
             }
             else
             {
-                
+
                 BuildInsertString();
                 try
                 {
                     com_insert.ExecuteNonQuery();
-                    
-                    if(comboBox1.SelectedItem.ToString() == "Mitarbeiter")
+
+                    if (comboBox1.SelectedItem.ToString() == "Mitarbeiter")
                     {
                         FillDataGrid(dataGridOutput, com_GetAllMitarbeiter);
                     }
@@ -502,15 +541,14 @@ namespace AdressbuchWPF
                     {
                         FillDataGrid(dataGridOutput, com_GetAllOrganisation);
                     }
-                    
+
                 }
-                catch(SQLiteException ex)
+                catch (SQLiteException ex)
                 {
                     MessageBox.Show(ex.Message);
                 }
-                
+
             }
-            
         }
 
 
@@ -567,6 +605,9 @@ namespace AdressbuchWPF
             
         }
 
-        
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            connection.Close();
+        }
     }
 }
